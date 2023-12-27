@@ -62,8 +62,8 @@ public class SecurityConfig{
                                 .requestMatchers("api/like/update/**","/api/comment/delete/**", "/api/comment/update/**", "/api/comment/add/**", "/member", "/member/edit/**", "member/delete/**").hasAnyRole("ADMIN","USER")
                                 .requestMatchers("/error").authenticated()
 
-
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
 
                 //세션을 사용하지 않으므로 STATELESS로 설정

@@ -108,17 +108,19 @@ public class MemberController {
     }
     @GetMapping(value = "check",params = "email")
     public ResponseEntity method4(String email){
+        System.out.println(email);
         if (memberService.getEmail(email)==null){
+            System.out.println("memberService = " + memberService.getEmail(email));
             return ResponseEntity.notFound().build();
-        }else {
+        } else {
             return ResponseEntity.ok().build();
         }
     }
-    @GetMapping(value = "check",params = "logId")
+    @GetMapping(value = "check", params = "nickName")
     public ResponseEntity method6(String logId) {
         if (memberService.getLogId(logId)==null){
             return ResponseEntity.notFound().build();
-        }else {
+        } else {
             return ResponseEntity.ok().build();
         }
     }
