@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table( schema = "prj3")
+@Table(schema = "prj1")
 @Getter @Setter
 @NoArgsConstructor
 public class Comment extends BaseTimeEntity{

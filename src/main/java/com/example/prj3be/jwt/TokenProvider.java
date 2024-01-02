@@ -141,9 +141,7 @@ public class TokenProvider implements InitializingBean {
     //로그아웃 시 refreshToken 삭제
     public Long deleteRefreshToken(String refreshToken) {
         String email = freshTokenRepository.findEmailByToken(refreshToken);
-        System.out.println("email = " + email);
         Long id = null;
-        System.out.println("id = " + id);
 
         if(isSocialMemberByEmail(email)) {
             id = memberRepository.findIdByEmail(email);

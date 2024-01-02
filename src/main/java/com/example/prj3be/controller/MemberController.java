@@ -63,9 +63,7 @@ public class MemberController {
         member.setPassword(passwordEncoder.encode(dto.getPassword()));
         member.setNickName(dto.getNickName());
         member.setGender(dto.getGender());
-
-        int age = getAge(dto);
-        member.setAge(age);
+        member.setAge(dto.getAge());
 
 //        Role role = Role.valueOf(String.valueOf(dto.getRole()));
 //        member.setRole(role);
@@ -82,14 +80,12 @@ public class MemberController {
         if(!authentication.getName().equals("anonymousUser")) {
             System.out.println("authentication.getName() = " + authentication.getName());
             Member findMember = memberService.findMemberByEmail(authentication.getName());
-            FindMemberDto dto = new FindMemberDto();
-            dto.setId(findMember.getId());
-            dto.setNickName(findMember.getNickName());
-            dto.setAddress(findMember.getAddress());
-            dto.setEmail(findMember.getEmail());
-            dto.setGender(findMember.getGender());
-//            dto.setRole(findMember.getRole());
-            return ResponseEntity.ok(dto);
+            if(findMember != null) {
+                FindMemberDto dto = new FindMemberDto(findMember);
+                return ResponseEntity.ok(dto);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -135,33 +131,6 @@ public class MemberController {
     @GetMapping("/{email}/orders")
     public List<String> method7(@PathVariable String email){
         return memberService.findOrderListByEmail(email);
-    }
-
-    private static int getAge(MemberFormDto dto) {
-        // 현재 날짜를 얻는다
-        LocalDate currentDate = LocalDate.now();
-        int currentYear = currentDate.getYear();
-        int currentMonth = currentDate.getMonthValue();
-        int currentDay = currentDate.getDayOfMonth();
-        // 생년월일을 분석한다.
-        Integer birthdateInt = dto.getBirthDate();
-        String birthdate = String.format("%06d", birthdateInt);
-        int birthYear = Integer.parseInt(birthdate.substring(0, 2));
-        int birthMonth = Integer.parseInt(birthdate.substring(2, 4));
-        int birthDay = Integer.parseInt(birthdate.substring(4, 6));
-        // 2000년대생인지 1900년대생인지 판단한다
-        if (birthYear >= 0 && birthYear <= 22) { // 현재 연도를 기준으로 조정할 수 있다
-            birthYear += 2000;
-        } else {
-            birthYear += 1900;
-        }
-        // 나이를 계산한다
-        int age = currentYear - birthYear;
-        // 생일이 지나지 않았으면 나이에서 1을 뺀다
-        if (birthMonth > currentMonth || (birthMonth == currentMonth && birthDay > currentDay)) {
-            age--;
-        }
-        return age;
     }
 
     @DeleteMapping("/delete/{id}")

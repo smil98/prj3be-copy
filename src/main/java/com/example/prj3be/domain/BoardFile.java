@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table (schema = "prj3")
+@Table (schema = "prj1")
 @NoArgsConstructor
 @Getter @Setter
 public class BoardFile {

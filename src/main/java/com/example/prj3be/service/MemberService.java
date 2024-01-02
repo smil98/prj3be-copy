@@ -81,7 +81,12 @@ public class MemberService {
     public Member findMemberByEmail(String email) {
         Long id = memberRepository.findIdByEmail(email);
         Optional<Member> findMember1 = memberRepository.findById(id);
-        Member member = findMember1.get();
+        Member member;
+        if(findMember1.isPresent()) {
+            member = findMember1.get();
+        } else {
+            return null;
+        }
 
         return member;
     }

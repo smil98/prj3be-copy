@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 //* like 는 sql예약어 , 테이블 명 지정 불가 -> likes 로 변경
 @Entity
-@Table(schema = "prj3")
+@Table(schema = "prj1")
 @Getter @Setter
 @NoArgsConstructor
 public class Likes {

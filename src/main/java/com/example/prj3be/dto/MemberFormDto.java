@@ -17,9 +17,7 @@ public class MemberFormDto {
     @NotBlank(message = "닉네임은 필수 입력값입니다.")
     private String nickName;
 
-    @NotNull(message = "생년월일은 필수 입력값입니다.")
-    @Positive
-    private Integer birthDate;
+    private Integer age;
 
     private String address;
     private Role role;
