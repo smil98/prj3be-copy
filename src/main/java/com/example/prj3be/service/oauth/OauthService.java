@@ -15,7 +15,6 @@ import com.example.prj3be.jwt.TokenProvider;
 import com.example.prj3be.repository.MemberRepository;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -24,7 +23,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -38,10 +36,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,27 +89,23 @@ public class OauthService {
         String email = socialUser.getEmail();
 
         //DB에 해당 유저가 없는지 조회
-        Member existingMember = memberRepository.findByEmailAndLogId(email, email);
+        Optional<Member> existingMember = memberRepository.findByEmail(email);
 
         //정보 받을 객체 선언, 생성 + 초기화는 하지 않음
         Member member;
         SocialToken tokenInfo;
 
-        if(existingMember == null) {
+        if(existingMember.isPresent()) {
+            member = existingMember.get();
+        } else {
             member = new Member();
-            member.setLogId(email);
-            member.setName(name);
             member.setEmail(email);
+            member.setNickName(name);
             member.setPassword(encoder.encode(email));
             // user로 role 지정
-            member.setRole(Role.ROLE_USER);
-            member.setActivated(true);
-            member.setIsSocialMember(true);
+            member.setRole(Role.ROLE_SOCIAL);
             memberRepository.save(member);
             System.out.println("New member created : " + member);
-        } else {
-            member = existingMember;
-            System.out.println("Existing member : " + member);
         }
 
         //SocialToken에 소셜 타입(로그아웃/토큰 갱신 시 분류 위해), access_token, refresh_token, expires_in 저장
@@ -130,7 +121,7 @@ public class OauthService {
         System.out.println("New token created : " + tokenInfo);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(member.getLogId(), member.getEmail());
+                new UsernamePasswordAuthenticationToken(member.getEmail(), member.getEmail());
         System.out.println("authenticationToken = " + authenticationToken);
 
         try {
@@ -203,13 +194,12 @@ public class OauthService {
                 Integer expiresIn = Integer.parseInt(expiresInObject.toString());
                 return ResponseEntity.ok().body(expiresIn);
             } else {
-                return ResponseEntity.ok().body(3600); // 갱신이 불필요하기 때문에 주기 다시 세팅 (3분)
+                return ResponseEntity.ok().body(3600); // 갱신이 불필요하기 때문에 주기 다시 세팅
             }
         } catch (OAuthException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (HttpClientErrorException.Unauthorized e) {
             System.out.println("소셜 토큰이 유효하지 않음");
-            //TODO: 리프레시 토큰 DB 삭제
             tokenProvider.deleteRefreshToken(refreshToken);
             //소셜 토큰이 유효하지 않으면 Unauthorized 리턴됨
             System.out.println("e.getMessage() = " + e.getMessage());

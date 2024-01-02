@@ -26,10 +26,10 @@ public class OrderController {
     public ResponseEntity method1() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(!authentication.getName().equals("anonymousUser")) {
-            Member findMember = orderService.findMemberByLogId(authentication.getName());
+            Member findMember = orderService.findMemberByEmail(authentication.getName());
             FindMemberDto dto = new FindMemberDto();
-            dto.setLogId(findMember.getLogId());
-            dto.setName(findMember.getName());
+            dto.setEmail(findMember.getEmail());
+            dto.setNickName(findMember.getNickName());
             dto.setAddress(findMember.getAddress());
             dto.setEmail(findMember.getEmail());
             dto.setGender(findMember.getGender());

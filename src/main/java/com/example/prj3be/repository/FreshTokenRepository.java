@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 
 public interface FreshTokenRepository extends JpaRepository<FreshToken, String> {
-    FreshToken findByLogId(String id);
+    FreshToken findByEmail(String email);
 
-    @Query("SELECT f.logId FROM FreshToken f WHERE f.token = :refreshToken")
-    String findLogIdByToken(String refreshToken);
+    @Query("SELECT f.email FROM FreshToken f WHERE f.token = :refreshToken")
+    String findEmailByToken(String refreshToken);
 }

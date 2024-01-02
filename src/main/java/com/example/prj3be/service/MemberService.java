@@ -40,19 +40,21 @@ public class MemberService {
     public void update(Long id, MemberEditFormDto dto) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + id));
+        member.setNickName(dto.getNickName());
         member.setPassword(passwordEncoder.encode(dto.getPassword()));
         member.setAddress(dto.getAddress());
         member.setAge(dto.getAge());
         member.setGender(dto.getGender());
-        member.setName(dto.getName());
+        member.setNickName(dto.getNickName());
     }
 
     public String getEmail(String email) {
         return memberRepository.findEmailByEmail(email)
                 .orElse(null);
     }
-    public String getLogId(String logId) {
-        return memberRepository.findLogIdByLogId(logId)
+
+    public String getNickName(String nickName) {
+        return memberRepository.findNickNameByNickName(nickName)
                 .orElse(null);
     }
 
@@ -62,9 +64,9 @@ public class MemberService {
 
         if (category != null && keyword != null) {
             if ("all".equals(category)) {
-                builder.and(member.name.containsIgnoreCase(keyword));
-            } else if ("logId".equals(category)) {
-                builder.and(member.logId.containsIgnoreCase(keyword));
+                builder.and(member.nickName.containsIgnoreCase(keyword));
+            } else if ("email".equals(category)) {
+                builder.and(member.email.containsIgnoreCase(keyword));
             }
         }
         Predicate predicate = builder.hasValue() ? builder.getValue() : null;
@@ -72,24 +74,24 @@ public class MemberService {
         if (predicate != null) {
             return memberRepository.findAll(predicate, pageable);
         } else {
-             return memberRepository.findAll(pageable);
+            return memberRepository.findAll(pageable);
         }
     }
 
-
-    public Member findMemberByLogId(String logId) {
-        Long id = memberRepository.findIdByLogId(logId);
+    public Member findMemberByEmail(String email) {
+        Long id = memberRepository.findIdByEmail(email);
         Optional<Member> findMember1 = memberRepository.findById(id);
         Member member = findMember1.get();
 
         return member;
     }
 
-    public List<String> findOrderListByLogId(String logId) {
-        Optional<Member> byLogId = memberRepository.findByLogId(logId);
-        Member member = byLogId.orElseThrow();
+    //TODO: 수정 요망
+    public List<String> findOrderListByEmail(String email) {
+        Optional<Member> byEmail = memberRepository.findByEmail(email);
+        Member member = byEmail.orElseThrow();
         Long id = member.getId();
-        return orderRepository.findOrderNamesByMemberLogId(id);
+        return orderRepository.findOrderNamesByMemberId(id);
     }
 
     public void deleteMember(Long id) {

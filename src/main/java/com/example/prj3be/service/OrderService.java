@@ -16,8 +16,8 @@ import java.util.Optional;
 public class OrderService {
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
-    public Member findMemberByLogId(String logId) {
-        Long id = memberRepository.findIdByLogId(logId);
+    public Member findMemberByEmail(String email) {
+        Long id = memberRepository.findIdByEmail(email);
         Optional<Member> findMember1 = memberRepository.findById(id);
         Member member = findMember1.get();
         return member;

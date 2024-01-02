@@ -11,11 +11,11 @@ import java.io.Serializable;
 @Setter
 public class MemberAuthDto implements Serializable {
     private static final long serialVersionUID = 1L; // serialVersionUID 추가
-    private String logId;
+    private String email;
     private String role;
     @JsonCreator
-    public MemberAuthDto(@JsonProperty("logId")String logId,@JsonProperty("role")String role) {
-        this.logId = logId;
+    public MemberAuthDto(@JsonProperty("email")String email,@JsonProperty("role")String role) {
+        this.email = email;
         this.role = role;
     }
 }

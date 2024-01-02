@@ -26,18 +26,18 @@ public class CommentController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SOCIAL')")
     @PostMapping("add/{boardId}")
     public void save(@PathVariable("boardId") String boardId, @RequestBody CommentFormDto content) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Member memberByLogId = commentService.findMemberByLogId(authentication.getName());
-        System.out.println("memberByLogId = " + memberByLogId.getLogId());
+        Member memberByEmail = commentService.findMemberByEmail(authentication.getName());
+        System.out.println("memberByEmail = " + memberByEmail.getEmail());
         System.out.println("authentication = " + authentication.getName());
-        commentService.write(boardId, content, memberByLogId);
+        commentService.write(boardId, content, memberByEmail);
     }
 
-    @PreAuthorize("#updateComment.member.logId == authentication.name")
+    @PreAuthorize("#updateComment.member.email == authentication.name")
     @PutMapping("update/{id}")
     public Comment update(@PathVariable Long id, @RequestBody Comment updateComment) {
         Comment editComment = commentService.update(id, updateComment);
@@ -46,7 +46,7 @@ public class CommentController {
 
     @DeleteMapping("delete/{id}")
     public void delete(@PathVariable Long id) {
-        String logId = commentService.findMemberById(id);
-        commentService.delete(id, logId);
+        String email = commentService.findMemberById(id);
+        commentService.delete(id, email);
     }
 }

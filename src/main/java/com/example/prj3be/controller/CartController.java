@@ -24,11 +24,11 @@ public class CartController {
     public List<CartItemDto> fetchCart() {
         System.out.println("CartController.fetchCart");
         //accessToken으로부터 로그인 아이디 추출
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("===========================================================");
-        System.out.println("logId = " + logId);
+        System.out.println("email = " + email);
         //로그인 아이디로부터 멤버 아이디 추출
-        Long memberId = memberRepository.findIdByLogId(logId);
+        Long memberId = memberRepository.findIdByEmail(email);
         System.out.println("memberId = " + memberId);
 
         return cartService.getCartList(memberId);
@@ -39,9 +39,9 @@ public class CartController {
         //id = board.id (상품명)
         System.out.println("boardId = " + boardId);
         System.out.println("CartController.createCartAndAddItem");
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("logId = " + logId);
-        Long memberId = memberRepository.findIdByLogId(logId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("email = " + email);
+        Long memberId = memberRepository.findIdByEmail(email);
         System.out.println("memberId = " + memberId);
         System.out.println("stockQuantity = " + stockQuantity);
 
@@ -62,9 +62,9 @@ public class CartController {
     @DeleteMapping("/delete/{cartItemId}")
     public ResponseEntity<?> deleteCartItem(@PathVariable Long cartItemId) {
         System.out.println("CartController.deleteCartItem");
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("logId = " + logId);
-        Long memberId = memberRepository.findIdByLogId(logId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("email = " + email);
+        Long memberId = memberRepository.findIdByEmail(email);
         System.out.println("memberId = " + memberId);
 
         try {
@@ -80,10 +80,10 @@ public class CartController {
     public void addCount(@PathVariable Long cartItemId) {
         System.out.println("========================================");
         System.out.println("CartController.addCount");
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("logId = " + logId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("email = " + email);
         //로그인 아이디로부터 멤버 아이디 추출
-        Long memberId = memberRepository.findIdByLogId(logId);
+        Long memberId = memberRepository.findIdByEmail(email);
         System.out.println("memberId = " + memberId);
 
         cartService.addCountToCartItem(memberId, cartItemId);
@@ -94,15 +94,13 @@ public class CartController {
     public void subtractCount(@PathVariable Long cartItemId) {
         System.out.println("========================================");
         System.out.println("CartController.subtractCount");
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("logId = " + logId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("email = " + email);
         //로그인 아이디로부터 멤버 아이디 추출
-        Long memberId = memberRepository.findIdByLogId(logId);
+        Long memberId = memberRepository.findIdByEmail(email);
         System.out.println("memberId = " + memberId);
 
         cartService.subtractCountFromCartItem(memberId, cartItemId);
         System.out.println("========================================");
     }
-
-
 }

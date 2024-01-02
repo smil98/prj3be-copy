@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
     @Query("SELECT o.orderName FROM Order o WHERE o.member.id = :id")
-    List<String> findOrderNamesByMemberLogId(@Param("id") Long id);
+    List<String> findOrderNamesByMemberId(@Param("id") Long id);
     @Transactional
     @Modifying
     @Query("DELETE FROM Order o WHERE o.member.id = :memberId")

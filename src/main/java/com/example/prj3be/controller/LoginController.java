@@ -28,9 +28,8 @@ public class LoginController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final OauthService oauthService;
 
-    @Value("${image.file.prefix}")
-    private String socialButtonImagePrefix;
-//    @Cacheable(value = "accesstokenCache",cacheManager = "accessTokenCacheManager",key = "#accessToken")
+
+    //    @Cacheable(value = "accesstokenCache",cacheManager = "accessTokenCacheManager",key = "#accessToken")
     @GetMapping("/accessToken")
     public MemberAuthDto isTokenValid(@RequestHeader("Authorization")String accessToken){
         if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
@@ -68,11 +67,11 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto){
-        System.out.println("loginDto.getLogId() = " + loginDto.getLogId());
+        System.out.println("loginDto.getEmail() = " + loginDto.getEmail());
         System.out.println("loginDto.getPassword() = " + loginDto.getPassword());
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getLogId(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
         System.out.println("LoginController.authorize");
         System.out.println("authenticationToken = " + authenticationToken);
@@ -109,26 +108,4 @@ public class LoginController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    //로그인 버튼 이미지 불러오기
-    @GetMapping("/api/login/image")
-    public ResponseEntity<String> socialButtonImage() {
-        return ResponseEntity.ok(socialButtonImagePrefix);
-    }
-
-    @GetMapping("/isSocialMember")
-    public Boolean isSocialMember(@RequestHeader("Authorization")String refreshToken) {
-        if(StringUtils.hasText(refreshToken) && refreshToken.startsWith("Bearer ")){
-            refreshToken = refreshToken.substring(7);
-        }
-
-        if(refreshToken != null) {
-            Boolean isSocial = tokenProvider.isSocialMember(refreshToken);
-            System.out.println("isSocial = " + isSocial);
-            return isSocial;
-        }
-
-        return false;
-    }
-
 }

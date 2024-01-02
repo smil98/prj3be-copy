@@ -47,8 +47,8 @@ public class CommentService {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    public Member findMemberByLogId(String logId) {
-        Long id = memberRepository.findIdByLogId(logId); //logId로 memberId 찾음
+    public Member findMemberByEmail(String email) {
+        Long id = memberRepository.findIdByEmail(email); //email로 memberId 찾음
         Optional<Member> findMember1 = memberRepository.findById(id); //memberId로 member 찾음
         Member member = findMember1.get();
         return member;
@@ -79,8 +79,8 @@ public class CommentService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') || #logId == authentication.name")
-    public void delete(Long id, String logId) {
+    @PreAuthorize("hasRole('ADMIN') || #email == authentication.name")
+    public void delete(Long id, String email) {
         commentRepository.deleteCommentByMemberId(id);
         commentRepository.deleteCommentByBoardId(id);
         commentRepository.deleteById(id);
@@ -90,6 +90,6 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment not found with id: " + id));
 
-        return comment.getMember().getLogId();
+        return comment.getMember().getEmail();
     }
 }

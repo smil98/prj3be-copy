@@ -31,15 +31,12 @@ public class MemberDetailService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return memberRepository.findOneWithAuthoritiesByLogId(username)
+        return memberRepository.findOneWithAuthoritiesByEmail(username)
                 .map(member->createUser(username, member))
                 .orElseThrow(()-> new UsernameNotFoundException(username + "->데이터베이스에서 찾을 수 없습니다."));
     }
 
     private User createUser(String username, Member member) {
-        if(!member.getActivated()){
-            throw new RuntimeException(username+"이 활성화 되어 있지 않습니다.");
-        }
 
 //        List<GrantedAuthority> grantedAuthorities = member.getAuthorities().stream()
 //                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
@@ -53,6 +50,6 @@ public class MemberDetailService implements UserDetailsService {
         System.out.println("MemberDetailService.createUser");
         System.out.println("grantedAuthority = " + grantedAuthority);
 
-        return new User(member.getLogId(), member.getPassword(), Collections.singletonList(grantedAuthority));
+        return new User(member.getEmail(), member.getPassword(), Collections.singletonList(grantedAuthority));
     }
 }

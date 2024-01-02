@@ -55,11 +55,11 @@ public class SecurityConfig{
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                .requestMatchers("/member/add","/member/check/**","/member/{logId}/orders","/api/board/list","api/board/id/**","api/board/file/id/**","api/like/board/**", "/authenticate","/actuator/**", "api/comment/list").permitAll()
+                .requestMatchers("/member/add","/member/check/**","/api/board/list","api/board/id/**","api/board/file/id/**","api/like/board/**", "/authenticate","/actuator/**", "api/comment/list").permitAll() //"/member/{logId}/orders" 추가
                                 .requestMatchers("/login","/refreshToken","/cart/**", "/api/logout","/api/login/image", "/isSocialMember", "/api/auth/**","/cpu","/jvm", "/signup").permitAll()
                                 .requestMatchers("/accessToken","/api/order", "/payment/**").authenticated()
                                 .requestMatchers("/api/board/add","/api/board/edit/**", "api/board/remove/**","member/list").hasRole("ADMIN")
-                                .requestMatchers("api/like/update/**","/api/comment/delete/**", "/api/comment/update/**", "/api/comment/add/**", "/member", "/member/edit/**", "member/delete/**").hasAnyRole("ADMIN","USER")
+                                .requestMatchers("api/like/update/**","/api/comment/delete/**", "/api/comment/update/**", "/api/comment/add/**", "/member", "/member/edit/**", "member/delete/**").hasAnyRole("ADMIN","USER", "SOCIAL")
                                 .requestMatchers("/error").authenticated()
 
 //                .anyRequest().authenticated()

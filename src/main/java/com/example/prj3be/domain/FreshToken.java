@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter @Setter
 public class FreshToken {
     @Id
-    @Column(name="log_id")
-    private String logId;
+    @Column(name="email")
+    private String email;
     @Column(name="token")
     private String token;
     @CreatedDate

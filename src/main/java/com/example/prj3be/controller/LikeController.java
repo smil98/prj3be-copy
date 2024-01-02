@@ -19,20 +19,20 @@ public class LikeController {
 
     private final LikeService service;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SOCIAL')")
     @GetMapping("update/{boardId}")
     public ResponseEntity<Map<String, Object>> like(@PathVariable Long boardId) {
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         System.out.println("id = " + boardId);
 
-        return ResponseEntity.ok(service.updateLike(boardId, logId));
+        return ResponseEntity.ok(service.updateLike(boardId, email));
     }
 
     @GetMapping("board/{boardId}")
     public ResponseEntity<Map<String, Object>>get(@PathVariable Long boardId) {
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        boolean isLiked = service.isLiked(boardId, logId);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isLiked = service.isLiked(boardId, email);
         int likeCount = service.getLikeCount(boardId);
         return ResponseEntity.ok(Map.of("isLiked", isLiked, "countLike", likeCount));
     }

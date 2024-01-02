@@ -48,9 +48,9 @@ dependencies {
     //Querydsl추가
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-
 
     //AWS
     implementation 'software.amazon.awssdk:s3:2.21.26'

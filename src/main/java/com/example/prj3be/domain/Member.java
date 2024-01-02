@@ -21,30 +21,25 @@ public class Member extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="log_id")
-    private String logId; //로그인용 아이디
-    private String password;
-    private String name;
-    private String address;
-
     @Column(unique = true)
     private String email;
+    private String password;
+
+    @Column(unique = true)
+    private String nickName;
 
     private Integer age;
-
-    private String gender; // 주민등록번호 뒤 첫번째 숫자.
+    private String gender;
+    private String address;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_USER; //ADMIN,ROLE_USER, 회원가입시 default는 user role
-
-    @Column(name="activated")
-    private Boolean activated;
-
-    @Column(name="is_social_member", columnDefinition = "boolean default false", nullable = false)
-    private Boolean isSocialMember;
+    private Role role = Role.ROLE_USER; //ADMIN, USER(default), SOCIAL
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private Set<SocialToken> socialTokens = new HashSet<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Likes> likes_member;
 
 //    @ManyToMany
 //    @JoinTable(
@@ -53,13 +48,4 @@ public class Member extends BaseTimeEntity{
 //            inverseJoinColumns = {@JoinColumn(name="authority_name", referencedColumnName = "authority_name")}
 //    )
 //    private Set<Authority> authorities;
-
-
-    @OneToMany(mappedBy = "member")
-    private List<Likes> likes_member;
-
-    public Member() {
-        this.logId = null;
-        this.isSocialMember = false;
-    }
 }

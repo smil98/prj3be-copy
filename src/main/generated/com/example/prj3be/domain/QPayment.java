@@ -36,6 +36,8 @@ public class QPayment extends EntityPathBase<Payment> {
 
     public final QMember member;
 
+    public final StringPath name = createString("name");
+
     public final StringPath paymentKey = createString("paymentKey");
 
     public final StringPath paymentName = createString("paymentName");

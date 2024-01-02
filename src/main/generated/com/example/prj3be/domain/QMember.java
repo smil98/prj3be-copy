@@ -22,8 +22,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
-    public final BooleanPath activated = createBoolean("activated");
-
     public final StringPath address = createString("address");
 
     public final NumberPath<Integer> age = createNumber("age", Integer.class);
@@ -34,13 +32,9 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isSocialMember = createBoolean("isSocialMember");
-
     public final ListPath<Likes, QLikes> likes_member = this.<Likes, QLikes>createList("likes_member", Likes.class, QLikes.class, PathInits.DIRECT2);
 
-    public final StringPath logId = createString("logId");
-
-    public final StringPath name = createString("name");
+    public final StringPath nickName = createString("nickName");
 
     public final StringPath password = createString("password");
 

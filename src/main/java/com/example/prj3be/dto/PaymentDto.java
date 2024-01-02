@@ -18,6 +18,7 @@ public class PaymentDto {
     private Long amount; //총 금액
     @NotNull
     private String paymentName; //결제 제목
+    private String name;
     @NotNull
     private String email;
     private String successUrl;

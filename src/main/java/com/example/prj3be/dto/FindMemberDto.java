@@ -13,10 +13,9 @@ import java.util.List;
 @Setter
 public class FindMemberDto {
     private Long id;
-    private String logId;
-    private String name;
-    private String address;
     private String email;
+    private String nickName;
+    private String address;
     private String gender;
     private Role role;
     private Integer age;
@@ -27,14 +26,12 @@ public class FindMemberDto {
 
     public FindMemberDto(Member member){
         this.id = member.getId();
-        this.logId = member.getLogId();
-        this.name=member.getName();
+        this.nickName=member.getNickName();
         this.address=member.getAddress();
         this.email= member.getEmail();
         this.gender=member.getGender();
         this.role=member.getRole();
         this.age= member.getAge();
         this.joinDate=member.getRegTime();
-
     }
 }

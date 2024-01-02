@@ -66,9 +66,9 @@ public class LikeService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    public boolean isLiked(Long boardId, String logId) {
-        if (!logId.equals("anonymousUser")) {
-            Member member = memberRepository.findByLogId(logId).orElseThrow(() -> new EntityNotFoundException("Member not found with logId: " + logId));
+    public boolean isLiked(Long boardId, String email) {
+        if (!email.equals("anonymousUser")) {
+            Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Member not found with email: " + email));
 
             return likeRepository.existsByBoardIdAndMemberId(boardId, member.getId());
         }
@@ -79,10 +79,10 @@ public class LikeService {
         return likeRepository.countByBoardId(boardId);
     }
 
-    public Map<String, Object> updateLike(Long id, String logId) {
+    public Map<String, Object> updateLike(Long id, String email) {
         Member member = null;
-        if (logId != null) {
-            member = memberRepository.findByLogId(logId).orElseThrow(()-> new EntityNotFoundException("Member not found with logId: " + logId));
+        if (email != null) {
+            member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("Member not found with email: " + email));
         }
 
         System.out.println("member = " + member);

@@ -1,5 +1,6 @@
 package com.example.prj3be.jwt;
 
+import com.example.prj3be.constant.Role;
 import com.example.prj3be.domain.FreshToken;
 import com.example.prj3be.domain.Member;
 import com.example.prj3be.dto.TokenDto;
@@ -66,14 +67,14 @@ public class TokenProvider implements InitializingBean {
         System.out.println("TokenProvider.createTokens");
         System.out.println("name = " + name);
 
+
         // 기존에 refreshToken이 있다면
-        if(freshTokenRepository.findByLogId(name) != null){
-//            freshTokenRepository.deleteByLogId(name);//안되는 코드
-            freshTokenRepository.deleteById(name);//정상작동 코드
+        if(freshTokenRepository.findByEmail(name) != null){
+            freshTokenRepository.deleteById(name);
         }
         // refreshToken을 DB에 저장
         FreshToken freshToken = new FreshToken();
-        freshToken.setLogId(name);
+        freshToken.setEmail(name);
         freshToken.setToken(refreshToken);
         freshTokenRepository.save(freshToken);
 
@@ -123,78 +124,73 @@ public class TokenProvider implements InitializingBean {
     //refresh 토큰을 이용해서 토큰들 재발급
     @Transactional
     public Authentication updateTokensByRefreshToken(String refreshToken){
-        String logId = freshTokenRepository.findLogIdByToken(refreshToken);
-        System.out.println("TokenProvider.updateTokensByRefreshToken's logId = " + logId);
+        String email = freshTokenRepository.findEmailByToken(refreshToken);
+        System.out.println("TokenProvider.updateTokensByRefreshToken's email = " + email);
 
         try {
-            Authentication authentication = getAuthentication(refreshToken, logId);
+            Authentication authentication = getAuthentication(refreshToken, email);
             return authentication;
         }catch (JwtException e){
             // 리프레시 토큰이 만료되었다면 DB에서 삭제
             System.out.println("업데이트 토큰즈 캐치문");
-            deleteRefreshTokenBylogId(logId);
+            deleteRefreshTokenByEmail(email);
         }
         return null;
     }
 
     //로그아웃 시 refreshToken 삭제
     public Long deleteRefreshToken(String refreshToken) {
-        String logId = freshTokenRepository.findLogIdByToken(refreshToken);
-        System.out.println("logId = " + logId);
+        String email = freshTokenRepository.findEmailByToken(refreshToken);
+        System.out.println("email = " + email);
         Long id = null;
         System.out.println("id = " + id);
 
-
-        if(isSocialMember(refreshToken)) {
-            id = memberRepository.findIdByLogId(logId);
+        if(isSocialMemberByEmail(email)) {
+            id = memberRepository.findIdByEmail(email);
         }
-        // logId가 null 인 경우 어차피 DB에 refreshToken이 없음=>근데 대체 왜 없어진거임?ㅜㅋㅋㅋ catch문 발생도 안보이는데
-        if(logId != null) {
-            freshTokenRepository.deleteById(logId);
+        if(email != null) {
+            freshTokenRepository.deleteById(email);
         }
         return id;
     }
 
-    // 소셜 멤버인지 아닌지 논리값 리턴
-    public Boolean isSocialMember(String refreshToken) {
-        String logId = freshTokenRepository.findLogIdByToken(refreshToken);
-        Boolean isSocialMember = memberRepository.checkSocialMemberByLogId(logId);
+    //소셜 멤버 여부 리턴
+    public boolean isSocialMemberByEmail (String email) {
+        Role role = memberRepository.checkSocialMemberByEmail(email);
 
-       return isSocialMember != null ? isSocialMember : false; //NullPointerException 나면 여기임
-    }
-
-    //탈퇴 시에 사용하는 소셜 멤버 여부 리턴
-    public Boolean isSocialMemberByLogId (String logId) {
-        Boolean isSocialMember = memberRepository.checkSocialMemberByLogId(logId);
-        return isSocialMember != null ? isSocialMember : false;
+        if(role == Role.ROLE_SOCIAL) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Long getIdRefreshToken(String refreshToken) {
         System.out.println("TokenProvider.getIdRefreshToken");
-        String logId = freshTokenRepository.findLogIdByToken(refreshToken);
-        Long id = memberRepository.findIdByLogId(logId);
+        String email = freshTokenRepository.findEmailByToken(refreshToken);
+        Long id = memberRepository.findIdByEmail(email);
         System.out.println("id = " + id);
         return id;
     }
 
     // 회원 탈퇴시 리프레시 토큰 삭제
-    public void deleteRefreshTokenBylogId(String name) {
+    public void deleteRefreshTokenByEmail(String name) {
         freshTokenRepository.deleteById(name);
     }
 
     public void deleteRefreshTokenById(Long id){
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + id));
-        freshTokenRepository.deleteById(member.getLogId());
+        freshTokenRepository.deleteById(member.getEmail());
     }
     //엑세스 토큰의 정보를 이용해 Authentication 객체 리턴
     public Authentication getAuthentication(String token){
         // 토큰을 이용해 클레임 생성
         Claims claims = Jwts.parserBuilder() //jwt 파싱 빌더 생성
-                            .setSigningKey(key) //jwt 검증 키 설정
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+                .setSigningKey(key) //jwt 검증 키 설정
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
         // 클레임에서 권한 정보 빼내기 클레임에서 auth 키에 해당하는 값을 가져오고 배열 만들기, SimpleGrantedAutority 객체로 매핑하기
         Collection<? extends GrantedAuthority> authorities =
@@ -212,7 +208,7 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
     // 리프레시 토큰의 정보를 이용해 Authentication 객체 리턴
-    public Authentication getAuthentication(String token, String logId) throws JwtException{
+    public Authentication getAuthentication(String token, String email) throws JwtException{
         System.out.println("리프레시 토큰 getAuthentication 진입");
         // 토큰을 이용해 클레임 생성
         Claims claims = Jwts.parserBuilder() //jwt 파싱 빌더 생성
@@ -228,7 +224,7 @@ public class TokenProvider implements InitializingBean {
                         .collect(Collectors.toList());
         System.out.println("클레임에서 권한 정보 빼내기");
         // 권한 정보들로 유저 객체 만들기
-        User principal = new User(logId, "", authorities);//사용자식별정보, 패스워드, 권한정보
+        User principal = new User(email, "", authorities);//사용자식별정보, 패스워드, 권한정보
 
         //유저객체, 토큰, 권한 객체로 Authentication 리턴
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);

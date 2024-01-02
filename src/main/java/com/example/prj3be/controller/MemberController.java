@@ -58,22 +58,17 @@ public class MemberController {
     @PostMapping("add")
     public void method1(@Validated @RequestBody MemberFormDto dto) {
         Member member = new Member();
-        member.setLogId(dto.getLogId());
-        member.setPassword(passwordEncoder.encode(dto.getPassword()));
-        member.setName(dto.getName());
-        member.setEmail(dto.getEmail());
-        if (dto.getFirstDigit()== 1 || dto.getFirstDigit()== 3) {
-            member.setGender("male");
-        }else {
-            member.setGender("female");
-        }
-        int age = getAge(dto);
 
+        member.setEmail(dto.getEmail());
+        member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        member.setNickName(dto.getNickName());
+        member.setGender(dto.getGender());
+
+        int age = getAge(dto);
         member.setAge(age);
-        member.setAddress(dto.getAddress());
+
 //        Role role = Role.valueOf(String.valueOf(dto.getRole()));
 //        member.setRole(role);
-        member.setActivated(true);
         memberService.signup(member);
     }
 
@@ -86,11 +81,10 @@ public class MemberController {
         System.out.println("authentication = " + authentication);
         if(!authentication.getName().equals("anonymousUser")) {
             System.out.println("authentication.getName() = " + authentication.getName());
-            Member findMember = memberService.findMemberByLogId(authentication.getName());
+            Member findMember = memberService.findMemberByEmail(authentication.getName());
             FindMemberDto dto = new FindMemberDto();
             dto.setId(findMember.getId());
-            dto.setLogId(findMember.getLogId());
-            dto.setName(findMember.getName());
+            dto.setNickName(findMember.getNickName());
             dto.setAddress(findMember.getAddress());
             dto.setEmail(findMember.getEmail());
             dto.setGender(findMember.getGender());
@@ -101,24 +95,25 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PreAuthorize("#dto.logId == authentication.name")
+    @PreAuthorize("#dto.email == authentication.name")
     @PutMapping("/edit/{id}")
     public void method3(@PathVariable Long id,@Validated @RequestBody MemberEditFormDto dto) {
-            memberService.update(id,dto);
+        memberService.update(id,dto);
     }
+
     @GetMapping(value = "check",params = "email")
-    public ResponseEntity method4(String email){
-        System.out.println(email);
+    public ResponseEntity method4(@RequestParam(name = "email") String email){
+        System.out.println("email = " + email);
         if (memberService.getEmail(email)==null){
-            System.out.println("memberService = " + memberService.getEmail(email));
             return ResponseEntity.notFound().build();
-        } else {
+        }else {
             return ResponseEntity.ok().build();
         }
     }
-    @GetMapping(value = "check", params = "nickName")
-    public ResponseEntity method6(String logId) {
-        if (memberService.getLogId(logId)==null){
+
+    @GetMapping(value = "check")
+    public ResponseEntity method5(@RequestParam(name="nickName") String nickName){
+        if (memberService.getNickName(nickName)==null){
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok().build();
@@ -135,11 +130,12 @@ public class MemberController {
         Page<Member> memberPage = memberService.findMemberList(pageable,keyword,category);
         return memberPage.map(FindMemberDto::new);
     }
-    @GetMapping("/{logId}/orders")
-    public List<String> method7(@PathVariable String logId){
-        return memberService.findOrderListByLogId(logId);
-    }
 
+    //TODO: 주문한 정보 리턴인데 수정하길...
+    @GetMapping("/{email}/orders")
+    public List<String> method7(@PathVariable String email){
+        return memberService.findOrderListByEmail(email);
+    }
 
     private static int getAge(MemberFormDto dto) {
         // 현재 날짜를 얻는다
@@ -170,42 +166,43 @@ public class MemberController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteAccount(@PathVariable Long id) {
-        String logId = SecurityContextHolder.getContext().getAuthentication().getName();
-        // TODO 계정 삭제 전 참조 무결성을 위해 점검해야할 것:
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
         // payment에서 해당 멤버 관련 레코드 삭제됐는지
         orderRepository.deleteByMemberId(id);
         paymentRepository.deleteByMemberId(id);
-        // 해당 멤버별  like 삭제됐는지
 
+        // 해당 멤버별  like 삭제됐는지
+        List<Likes> likes = likeRepository.findByMemberId(id);
+        likeRepository.deleteAll(likes);
+
+        // 해당 멤버가 작성한 코멘트가 삭제됐는지
+        commentRepository.deleteCommentByMemberId(id);
 
         // fresh_token 삭제 됐는지
-        if(!logId.equals("anonymousUser")) {
+        if(!email.equals("anonymousUser")) {
             //토큰 만료되지 않았을 경우
-            tokenProvider.deleteRefreshTokenBylogId(logId);
+            tokenProvider.deleteRefreshTokenByEmail(email);
         }else{
-            //토큰 만료 된 경우 => 일단 그냥 id를 통해서 삭제 하는 걸로
+            //토큰 만료 된 경우 => 일단 그냥 id를 통해서 삭제
             tokenProvider.deleteRefreshTokenById(id);
         }
 
         // social 멤버인지, 맞다면 social Token 삭제
-        Boolean isSocial = tokenProvider.isSocialMemberByLogId(logId);
+        boolean isSocial = tokenProvider.isSocialMemberByEmail(email);
         if(isSocial) {
             oauthService.deleteSocial(id);
         }
-        //이 멤버에 카트가 존재시에
-        if (cartService.findCart(id) != false){
-        //장바구니 아이템 삭제
-        cartService.deleteCartItem(id);
-        //장바구니 삭제
-        cartService.deleteCart(id);
+
+        //이 멤버의 카트가 존재한다면
+        if (cartService.findCart(id) != false) {
+            //장바구니 아이템 삭제
+            cartService.deleteCartItem(id);
+            //장바구니 삭제
+            cartService.deleteCart(id);
         }
 
-        //회원 삭제
-        List<Likes> likes = likeRepository.findByMemberId(id);
-        likeRepository.deleteAll(likes);
-
-        commentRepository.deleteCommentByMemberId(id);
-
+        // 회원 삭제
         memberService.deleteMember(id);
 
         return ResponseEntity.ok().build();

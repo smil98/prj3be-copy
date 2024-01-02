@@ -19,7 +19,7 @@ public class QFreshToken extends EntityPathBase<FreshToken> {
 
     public static final QFreshToken freshToken = new QFreshToken("freshToken");
 
-    public final StringPath logId = createString("logId");
+    public final StringPath email = createString("email");
 
     public final DateTimePath<java.time.LocalDateTime> regTime = createDateTime("regTime", java.time.LocalDateTime.class);
 

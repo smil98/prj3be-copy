@@ -11,8 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 public class LoginDto {
     @NotBlank
-    private String logId;
+    private String email;
     @NotBlank
-    @Size(min=4, max=16)
+    @Size(min=6, max=16)
     private String password;
 }

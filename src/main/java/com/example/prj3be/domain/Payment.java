@@ -29,6 +29,7 @@ public class Payment extends BaseTimeEntity{
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+    private String name;
     private String paymentKey;
     private String failReason;
     private boolean cancelYN;
@@ -54,7 +55,7 @@ public class Payment extends BaseTimeEntity{
                 .paymentName(this.paymentName)
                 .paymentUid(this.paymentUid)
                 .customerEmail(this.member != null ? this.member.getEmail() : null)
-                .customerName(this.member != null ? this.member.getName() : null)
+                .customerName(this.name)
                 // URL은 이 메서드에서 설정하지 않고 컨트롤러에서 설정
                 .failReason(this.failReason)
                 .cancelYN(this.cancelYN)

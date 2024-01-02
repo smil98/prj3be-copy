@@ -32,9 +32,9 @@ public class PaymentService {
     private final PaymentConfig paymentConfig;
     private final OrderRepository orderRepository;
 
-    public Payment requestTossPayment(Payment payment, String logId) throws CustomLogicException {
+    public Payment requestTossPayment(Payment payment, String Email) throws CustomLogicException {
         // 처음 결제 요청시 값들에 대한 검증
-        Optional<Member> findMember = memberRepository.findByLogId(logId);
+        Optional<Member> findMember = memberRepository.findByEmail(Email);
         Member member = findMember.orElseThrow();
         if (payment.getAmount() < 1000) {
             //결제 금액이 1000원 미만이면 오류
@@ -105,9 +105,9 @@ public class PaymentService {
         return headers;
     }
 
-    public Map cancelPayment(String logId, String paymentKey, String cancelReason) {
-        Optional<Member> byLogId = memberRepository.findByLogId(logId);
-        Member member = byLogId.orElseThrow();
+    public Map cancelPayment(String email, String paymentKey, String cancelReason) {
+        Optional<Member> byEmail = memberRepository.findByEmail(email);
+        Member member = byEmail.orElseThrow();
         Payment payment = paymentRepository.findByPaymentKeyAndMember_Email(paymentKey, member.getEmail()).orElseThrow(() -> {
             throw new CustomLogicException(ExceptionCode.PAYMENT_NOT_FOUND);
         });
