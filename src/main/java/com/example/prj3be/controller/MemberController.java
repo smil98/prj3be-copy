@@ -91,7 +91,34 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PreAuthorize("#dto.email == authentication.name")
+    @GetMapping("/{id}")
+    public ResponseEntity<FindMemberDto> getMemberById(@PathVariable Long id) {
+        System.out.println("id = " + id);
+        System.out.println("MemberController.getMemberById");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member findMember = memberService.findMemberById(id); // 일단 찾아놓고
+
+        if (findMember != null) { //멤버가 null이 아니면
+            if(authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))) {
+                //admin인지 확인, 맞으면 찾은 멤버 정보 전송
+                FindMemberDto dto = new FindMemberDto(findMember);
+                return ResponseEntity.ok(dto);
+            } else { //admin이 아닐 때
+                if (authentication.getName().equals(findMember.getEmail())) { //찾는 멤버의 이메일과 authentication.getName() 비교
+                    FindMemberDto dto = new FindMemberDto(findMember); //본인이 맞으면 전송
+                    return ResponseEntity.ok(dto);
+                } else {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+            }
+        } else {
+            //해당되는 멤버가 없음
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') || #dto.email == authentication.name")
     @PutMapping("/edit/{id}")
     public void method3(@PathVariable Long id,@Validated @RequestBody MemberEditFormDto dto) {
         memberService.update(id,dto);
