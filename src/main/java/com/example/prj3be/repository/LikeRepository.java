@@ -1,15 +1,17 @@
 package com.example.prj3be.repository;
 
 import com.example.prj3be.domain.Likes;
+import com.example.prj3be.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface LikeRepository extends JpaRepository<Likes, Long> {
+public interface LikeRepository extends JpaRepository<Likes, Long>, QuerydslPredicateExecutor<Likes> {
 
     boolean existsByBoardIdAndMemberId(Long boardId, Long id);
 
