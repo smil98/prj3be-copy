@@ -164,6 +164,8 @@ public class MemberController {
     public ResponseEntity deleteAccount(@PathVariable Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        boolean hasRefreshToken = tokenProvider.hasRefreshTokenByEmail(email);
+
         // payment에서 해당 멤버 관련 레코드 삭제됐는지
         orderRepository.deleteByMemberId(id);
         paymentRepository.deleteByMemberId(id);
@@ -176,7 +178,7 @@ public class MemberController {
         commentRepository.deleteCommentByMemberId(id);
 
         // fresh_token 삭제 됐는지
-        if(!email.equals("anonymousUser")) {
+        if(hasRefreshToken) {
             //토큰 만료되지 않았을 경우
             tokenProvider.deleteRefreshTokenByEmail(email);
         }else{

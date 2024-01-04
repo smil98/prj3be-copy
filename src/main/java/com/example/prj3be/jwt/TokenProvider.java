@@ -127,6 +127,11 @@ public class TokenProvider implements InitializingBean {
         String email = freshTokenRepository.findEmailByToken(refreshToken);
         System.out.println("TokenProvider.updateTokensByRefreshToken's email = " + email);
 
+        if(email == null) {
+            System.out.println("TokenProvider.updateTokensByRefreshToken = email has not been found");
+            return null;
+        }
+
         try {
             Authentication authentication = getAuthentication(refreshToken, email);
             return authentication;
@@ -172,8 +177,12 @@ public class TokenProvider implements InitializingBean {
     }
 
     // 회원 탈퇴시 리프레시 토큰 삭제
-    public void deleteRefreshTokenByEmail(String name) {
-        freshTokenRepository.deleteById(name);
+    public void deleteRefreshTokenByEmail(String email) {
+        if (email != null) {
+            freshTokenRepository.deleteById(email);
+        } else {
+            throw new IllegalArgumentException("이메일이 없습니다.");
+        }
     }
 
     public void deleteRefreshTokenById(Long id){
@@ -245,5 +254,13 @@ public class TokenProvider implements InitializingBean {
         }
 
         return false;
+    }
+
+    public boolean hasRefreshTokenByEmail(String email) {
+        FreshToken byEmail = freshTokenRepository.findByEmail(email);
+        if(byEmail.getToken().isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

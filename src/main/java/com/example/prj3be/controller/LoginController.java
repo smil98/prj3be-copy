@@ -54,6 +54,8 @@ public class LoginController {
         if(StringUtils.hasText(refreshToken) && refreshToken.startsWith("Bearer ")){
             refreshToken = refreshToken.substring(7);
         }
+
+        //TODO: 여기서 이메일 refreshToken 모두 NULL일 때 어떻게 처리할지 생각하기
         Authentication authentication = tokenProvider.updateTokensByRefreshToken(refreshToken);
 
         System.out.println("LoginController.byRefreshToken's authentication = " + authentication);
