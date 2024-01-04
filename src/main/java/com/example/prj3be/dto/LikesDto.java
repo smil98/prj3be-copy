@@ -12,12 +12,18 @@ public class LikesDto {
     private String title;
     private String artist;
     private Double price;
+    private String fileUrl;
+
 
     public LikesDto(Likes likes) {
         this.id = likes.getId();
         this.boardId = likes.getBoard().getId();
         this.title = likes.getBoard().getTitle();
         this.artist = likes.getBoard().getArtist();
-        this.price = likes.getBoard().getPrice();;
+        this.price = likes.getBoard().getPrice();
+
+        if (!likes.getBoard().getBoardFiles().isEmpty()) {
+            this.fileUrl = likes.getBoard().getBoardFiles().get(0).getFileUrl();
+        }
     }
 }

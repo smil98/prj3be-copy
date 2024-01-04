@@ -100,7 +100,7 @@ public class BoardService {
 
         for (int i = 0;
              i < files.length; i++) {
-            String url = urlPrefix + "prj3/" + board.getId() + "/" + files[i].getOriginalFilename();
+            String url = urlPrefix + "prj1/" + board.getId() + "/" + files[i].getOriginalFilename();
             boardFile.setFileName(files[i].getOriginalFilename());
             boardFile.setFileUrl(url);
             boardFile.setBoard(savedBoard);
@@ -112,7 +112,7 @@ public class BoardService {
 
     //AWS s3에 파일 업로드
     private void upload(MultipartFile file, Long id) throws IOException {
-        String key = "prj3/" + id + "/" + file.getOriginalFilename();
+        String key = "prj1/" + id + "/" + file.getOriginalFilename();
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)

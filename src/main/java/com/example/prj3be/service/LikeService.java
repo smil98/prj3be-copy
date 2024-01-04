@@ -145,12 +145,24 @@ public class LikeService {
             }
         }
 
+        builder.and(likes.member.id.eq(id)); //해당 아이디를 가진 멤버가 누른 likes 조건 추가
+
         Predicate predicate = builder.hasValue() ? builder.getValue() : null;
 
         if(predicate != null) {
             return likeRepository.findAll(predicate, pageable);
         } else {
             return likeRepository.findAll(pageable);
+        }
+    }
+
+    public boolean checkForUser(Long id, String email) {
+        //url로 받은 아이디와 context에 저장된 email로 아이디를 받아와서 비교
+        Long idByContext = memberRepository.findIdByEmail(email);
+        if(id == idByContext) {
+            return true;
+        } else {
+            return false;
         }
     }
 

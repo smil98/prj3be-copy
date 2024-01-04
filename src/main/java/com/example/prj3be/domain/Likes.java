@@ -27,7 +27,4 @@ public class Likes {
     @JoinColumn(name = "member_id", nullable = false)
     @JsonIgnore
     private Member member;
-
-
-
 }

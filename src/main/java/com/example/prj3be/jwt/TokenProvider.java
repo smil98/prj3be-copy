@@ -200,7 +200,7 @@ public class TokenProvider implements InitializingBean {
         System.out.println("claims.getSubject() = " + claims.getSubject());
 
         // 권한 정보들로 유저 객체 만들기
-        User principal = new User(claims.getSubject(), "", authorities);//사용자식별정보, 패스워드, 권한정보
+        User principal = new User(claims.getSubject(), "dummyPassword", authorities);//사용자식별정보, 패스워드, 권한정보
 
         //유저객체, 토큰, 권한 객체로 Authentication 리턴
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
