@@ -37,18 +37,37 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity createCartAndAddItem(Long boardId, Long stockQuantity) {
         //id = board.id (상품명)
-        System.out.println("boardId = " + boardId);
-        System.out.println("CartController.createCartAndAddItem");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("email = " + email);
         Long memberId = memberRepository.findIdByEmail(email);
-        System.out.println("memberId = " + memberId);
-        System.out.println("stockQuantity = " + stockQuantity);
 
         try {
             Cart cart = cartService.createCart(memberId);
-            System.out.println("CartController에서 cart = " + cart.getId());
             cartService.addItemsToCart(cart, boardId, stockQuantity);
+            return ResponseEntity.ok().build();
+        } catch (OutOfStockException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PostMapping("/addLiked")
+    public ResponseEntity createCartAndAddLiked(Long boardId) {
+        System.out.println("CartController.createCartAndAddLiked");
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long memberId = memberRepository.findIdByEmail(email);
+
+        try {
+            Cart cart = cartService.createCart(memberId);
+            Long stockQuantity = cartService.getBoardInfoByBoardId(boardId);
+            if(stockQuantity != null) {
+                cartService.addItemsToCart(cart, boardId, stockQuantity);
+                cartService.deleteLikedByBoardId(memberId, boardId);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             return ResponseEntity.ok().build();
         } catch (OutOfStockException e) {
             e.printStackTrace();
@@ -78,7 +97,6 @@ public class CartController {
 
     @GetMapping("/addCount/{cartItemId}")
     public void addCount(@PathVariable Long cartItemId) {
-        System.out.println("========================================");
         System.out.println("CartController.addCount");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("email = " + email);
@@ -87,12 +105,10 @@ public class CartController {
         System.out.println("memberId = " + memberId);
 
         cartService.addCountToCartItem(memberId, cartItemId);
-        System.out.println("========================================");
     }
 
     @GetMapping("/subtractCount/{cartItemId}")
     public void subtractCount(@PathVariable Long cartItemId) {
-        System.out.println("========================================");
         System.out.println("CartController.subtractCount");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("email = " + email);
@@ -101,6 +117,5 @@ public class CartController {
         System.out.println("memberId = " + memberId);
 
         cartService.subtractCountFromCartItem(memberId, cartItemId);
-        System.out.println("========================================");
     }
 }

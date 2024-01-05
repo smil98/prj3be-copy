@@ -23,6 +23,7 @@ public class CartService {
     private final BoardRepository boardRepository;
     private final CartItemRepository cartItemRepository;
     private final MemberRepository memberRepository;
+    private final LikeRepository likeRepository;
 
     // 카트 생성
     public Cart createCart(Long memberId) {
@@ -145,5 +146,17 @@ public class CartService {
         }else {
             return true;
         }
+    }
+
+    public Long getBoardInfoByBoardId(Long boardId) {
+        Optional<Board> byId = boardRepository.findById(boardId);
+        if(byId.isPresent()) {
+            return byId.get().getStockQuantity();
+        }
+        return null;
+    }
+
+    public void deleteLikedByBoardId(Long memberId, Long boardId) {
+        likeRepository.deleteByBoardIdAndMemberId(boardId, memberId);
     }
 }

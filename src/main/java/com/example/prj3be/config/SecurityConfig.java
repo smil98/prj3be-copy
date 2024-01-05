@@ -55,7 +55,7 @@ public class SecurityConfig{
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                .requestMatchers("/member/add","/member/check/**","/api/board/list","api/board/id/**", "api/board/file/id/**","api/like/board/**", "/api/like/list/**", "/likes/**", "/authenticate","/actuator/**", "api/comment/list").permitAll() //"/member/{logId}/orders" 추가
+                .requestMatchers("/member/add","/member/check/**","/api/board/list","api/board/id/**", "api/board/file/id/**","api/like/board/**", "/member/{email}/orders","/api/like/list/**", "/likes/**", "/authenticate","/actuator/**", "api/comment/list").permitAll()
                                 .requestMatchers("/login","/refreshToken","/cart/**", "/api/logout","/api/login/image", "/isSocialMember", "/api/auth/**","/cpu","/jvm", "/signup").permitAll()
                                 .requestMatchers("/accessToken","/api/order", "/payment/**").authenticated()
                                 .requestMatchers("/api/board/add","/api/board/edit/**", "api/board/remove/**","member/list").hasRole("ADMIN")
