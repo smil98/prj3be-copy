@@ -36,6 +36,7 @@ public class CommentService {
 
         List<Comment> content = query.selectFrom(QComment.comment)
                 .where(QComment.comment.board.id.eq(boardId))
+                .orderBy(QComment.comment.updateTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
