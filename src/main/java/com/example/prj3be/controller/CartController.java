@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,11 +55,13 @@ public class CartController {
     }
 
     @PostMapping("/addLiked")
-    public ResponseEntity createCartAndAddLiked(Long boardId) {
+    public ResponseEntity createCartAndAddLiked(@RequestBody Map<String, Long> request) {
         System.out.println("CartController.createCartAndAddLiked");
+        Long boardId = request.get("boardId");
+        System.out.println("boardId = " + boardId);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Long memberId = memberRepository.findIdByEmail(email);
-
+        System.out.println("memberId = " + memberId);
         try {
             Cart cart = cartService.createCart(memberId);
             Long stockQuantity = cartService.getBoardInfoByBoardId(boardId);

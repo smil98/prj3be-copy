@@ -7,6 +7,7 @@ import com.example.prj3be.domain.Member;
 import com.example.prj3be.dto.CartItemDto;
 import com.example.prj3be.exception.OutOfStockException;
 import com.example.prj3be.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,13 +150,17 @@ public class CartService {
     }
 
     public Long getBoardInfoByBoardId(Long boardId) {
+        System.out.println("boardId = " + boardId);
         Optional<Board> byId = boardRepository.findById(boardId);
         if(byId.isPresent()) {
+            System.out.println("byId = " + byId.get().getStockQuantity());
             return byId.get().getStockQuantity();
+        } else {
+            throw new EntityNotFoundException("Board not found with ID: " + boardId);
         }
-        return null;
     }
 
+    @Transactional
     public void deleteLikedByBoardId(Long memberId, Long boardId) {
         likeRepository.deleteByBoardIdAndMemberId(boardId, memberId);
     }
