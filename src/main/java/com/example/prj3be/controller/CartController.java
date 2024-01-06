@@ -57,6 +57,17 @@ public class CartController {
         }
     }
 
+    @PostMapping("/move")
+    public ResponseEntity moveSelectedCartItems() {
+        return null;
+    }
+
+    @DeleteMapping("/delete/cartItems")
+    public ResponseEntity deleteSelectedCartItems() {
+        return null;
+    }
+
+
     @PostMapping("/add/liked")
     public ResponseEntity createCartAndAddLiked(@RequestBody Map<String, Long> request) {
         System.out.println("CartController.createCartAndAddLiked");
