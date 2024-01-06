@@ -28,13 +28,13 @@ public class CartItem {
     private String fileUrl;
     private Long stockQuantity;
 
-    public static CartItem createCartItem(Cart cart, Board board, int count, String fileUrl, Long stockQuantity) {
+    public static CartItem createCartItem(Cart cart, Board board, int count) {
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setBoard(board);
         cartItem.setCount(count);
-        cartItem.setFileUrl(fileUrl);
-        cartItem.setStockQuantity(stockQuantity);
+        cartItem.setFileUrl(board.getBoardFiles().get(0).getFileUrl());
+        cartItem.setStockQuantity(board.getStockQuantity());
         return cartItem;
     }
 
