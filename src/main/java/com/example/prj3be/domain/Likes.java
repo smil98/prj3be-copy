@@ -27,4 +27,10 @@ public class Likes {
     @JoinColumn(name = "member_id", nullable = false)
     @JsonIgnore
     private Member member;
+
+    public Likes(Board board, Member member) {
+        this.board = board;
+        this.member = member;
+    }
+
 }

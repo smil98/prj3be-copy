@@ -1,5 +1,6 @@
 package com.example.prj3be.repository;
 
+import com.example.prj3be.domain.Board;
 import com.example.prj3be.domain.CartItem;
 import com.example.prj3be.dto.CartItemDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("SELECT ci FROM CartItem ci WHERE ci.cart.id= :cartId AND ci.id = :cartItemId")
     CartItem findCartItemByCartIdAndCartItemId(Long cartId, Long cartItemId);
+
+    @Query("SELECT ci.board FROM CartItem ci WHERE ci.id = :cartItemId")
+    List<Board> findBoardIdByCartItemId(List<Long> cartItemId);
 
     @Modifying
     @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId AND ci.id = :cartItemId")

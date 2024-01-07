@@ -1,6 +1,7 @@
 package com.example.prj3be.controller;
 
 import com.example.prj3be.domain.Cart;
+import com.example.prj3be.domain.Member;
 import com.example.prj3be.dto.CartItemDto;
 import com.example.prj3be.exception.OutOfStockException;
 import com.example.prj3be.jwt.TokenProvider;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,13 +60,57 @@ public class CartController {
     }
 
     @PostMapping("/move")
-    public ResponseEntity moveSelectedCartItems() {
-        return null;
+    public ResponseEntity moveSelectedCartItems(@RequestBody Map<String, List<Long>> request,
+                                                @RequestHeader("Authorization") String accessToken) {
+        System.out.println("CartController.moveSelectedCartItems");
+        List<Long> cartItemIds = request.get("selectedItems");
+
+        if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+            accessToken = accessToken.substring(7);
+        }
+
+        if(tokenProvider.validateToken(accessToken)) {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Optional<Member> member = memberRepository.findByEmail(email);
+            if(member.isPresent()) {
+                try {
+                    cartService.addToLikeByCartItemId(member.get(), cartItemIds);
+                    cartService.deleteCartItemsByCartItemId(cartItemIds);
+                    return ResponseEntity.ok().build();
+                } catch (Exception e) {
+                    System.out.println("Error occured while adding to likes or deleting = " + e);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+            } else {
+                System.out.println(" Member가 존재하지 않음 ");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @DeleteMapping("/delete/cartItems")
-    public ResponseEntity deleteSelectedCartItems() {
-        return null;
+    public ResponseEntity deleteSelectedCartItems(@RequestParam Map<String, List<Long>> request,
+                                                  @RequestHeader("Authorization") String accessToken) {
+        System.out.println("CartController.deleteSelectedCartItems");
+        List<Long> cartItemIds = request.get("selectedItems");
+
+        if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+            accessToken = accessToken.substring(7);
+        }
+
+        if(tokenProvider.validateToken(accessToken)) {
+            try {
+                cartService.deleteSelectedLikes(cartItemIds);
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                System.out.println("Error occured while deleting = " + e);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
 
@@ -134,8 +180,13 @@ public class CartController {
         }
 
         if(tokenProvider.validateToken(accessToken)) {
-            cartService.deleteSelectedLikes(selectedLikes);
+            try {
+                cartService.deleteSelectedLikes(selectedLikes);
             return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                System.out.println("삭제 중 문제 발생: " + e);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

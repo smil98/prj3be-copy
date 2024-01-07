@@ -98,9 +98,7 @@ public class LikeService {
         if (isLiked) {
             likeRepository.deleteByBoardIdAndMemberId(id, member.getId());
         } else {
-            Likes like = new Likes();
-            like.setBoard(boardRepository.findById(id).get());
-            like.setMember(member);
+            Likes like = new Likes(boardRepository.findById(id).get(), member);
             likeRepository.save(like);
         }
 

@@ -162,9 +162,25 @@ public class CartService {
         }
     }
 
+    public void addToLikeByCartItemId (Member member, List<Long> cartItemIds) {
+        List<Board> boards = cartItemRepository.findBoardIdByCartItemId(cartItemIds);
+        System.out.println("boards = " + boards);
+        for(Board board : boards) {
+            System.out.println("board = " + board);
+            Likes like = new Likes(board, member);
+            likeRepository.save(like);
+        }
+    }
+
     //찜한 목록에서 카트로 이동한 상품들 좋아요 내역 삭제
     @Transactional
     public void deleteSelectedLikes(List<Long> selectedLikes) {
         likeRepository.deleteAllById(selectedLikes);
     }
+
+    @Transactional
+    public void deleteCartItemsByCartItemId(List<Long> cartItemIds) {
+        cartItemRepository.deleteAllById(cartItemIds);
+    }
+
 }
