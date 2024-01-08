@@ -1,10 +1,17 @@
 package com.example.prj3be.controller;
 
 import com.example.prj3be.domain.*;
+import com.example.prj3be.dto.BoardDto;
+import com.example.prj3be.dto.BoardsDto;
+import com.example.prj3be.jwt.TokenProvider;
 import com.example.prj3be.service.BoardService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +25,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/board")
 public class BoardController {
     private final BoardService boardService;
+    private final TokenProvider tokenProvider;
 
     @GetMapping("list")
     public Page<Board> list(Pageable pageable,
@@ -56,15 +64,22 @@ public class BoardController {
     }
 
 
-    @GetMapping("id/{id}")
-    public Optional<Board> get(@PathVariable Long id) {
-        return boardService.getBoardById(id);
-    }
-    @GetMapping("file/id/{id}")
-    public List<String> getURL(@PathVariable Long id) {
-        return boardService.getBoardURL(id);
+    @GetMapping("/{id}")
+    public BoardsDto get(@PathVariable Long id) {
+        System.out.println("BoardController.get");
+        System.out.println("id = " + id);
+        Optional<Board> board = boardService.getBoardById(id);
+        if(board.isPresent()) {
+            return new BoardsDto(board.get());
+        } else {
+            return null;
+        }
     }
 
+//    @GetMapping("file/id/{id}")
+//    public List<String> getURL(@PathVariable Long id) {
+//        return boardService.getBoardURL(id);
+//    }
 
     @PutMapping("edit/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -79,9 +94,23 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/manage")
+    @GetMapping("/fetch")
     @PreAuthorize("hasRole('ADMIN')")
-    public void manage() {
+    public Page<BoardsDto> fetchList(Pageable pageable,
+                                  @RequestParam(value = "k", defaultValue = "") String keyword,
+                                  @RequestParam(value = "c", defaultValue = "all") String category,
+                                  @RequestHeader("Authorization") String accessToken) {
+        System.out.println("BoardController.manage");
+        if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+            accessToken = accessToken.substring(7);
+        }
+
+        if(tokenProvider.validateToken(accessToken)) {
+            Page<Board> boardsPage = boardService.getAllBoards(pageable, keyword, category);
+            return boardsPage.map(BoardsDto::new);
+        } else {
+            return null;
+        }
 
     }
 
@@ -91,12 +120,6 @@ public class BoardController {
     public void delete(@PathVariable Long id) {
         boardService.delete(id);
     }
-
-
-    public BoardController(BoardService boardService) {
-        this.boardService = boardService;
-    }
-
 
 }
 

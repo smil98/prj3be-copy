@@ -4,6 +4,7 @@ import com.example.prj3be.domain.*;
 
 import com.example.prj3be.repository.*;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -207,4 +208,26 @@ public class BoardService {
         this.s3 = s3;
     }
 
+    public Page<Board> getAllBoards(Pageable pageable, String keyword, String category) {
+        QBoard board = QBoard.board;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if(category != null && keyword != null) {
+            if("id".equals(category)) {
+                builder.and(board.id.eq(Long.valueOf(keyword)));
+            } else if ("title".equals(category)) {
+                builder.and(board.title.containsIgnoreCase(keyword));
+            } else if ("artist".equals(category)) {
+                builder.and(board.artist.containsIgnoreCase(keyword));
+            }
+        }
+
+        Predicate predicate = builder.hasValue() ? builder.getValue() : null;
+
+        if(predicate != null) {
+            return boardRepository.findAll(predicate, pageable);
+        } else {
+            return boardRepository.findAll(pageable);
+        }
+    }
 }

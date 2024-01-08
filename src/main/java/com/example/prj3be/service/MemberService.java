@@ -64,12 +64,13 @@ public class MemberService {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (category != null && keyword != null) {
-            if ("all".equals(category)) {
+            if ("nickName".equals(category)) {
                 builder.and(member.nickName.containsIgnoreCase(keyword));
             } else if ("email".equals(category)) {
                 builder.and(member.email.containsIgnoreCase(keyword));
             }
         }
+
         Predicate predicate = builder.hasValue() ? builder.getValue() : null;
 
         if (predicate != null) {
