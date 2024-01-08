@@ -3,6 +3,7 @@ package com.example.prj3be.controller;
 import com.example.prj3be.domain.*;
 import com.example.prj3be.dto.BoardDto;
 import com.example.prj3be.dto.BoardsDto;
+import com.example.prj3be.dto.MemberAuthDto;
 import com.example.prj3be.jwt.TokenProvider;
 import com.example.prj3be.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +40,14 @@ public class BoardController {
                             @RequestParam(required = false) AlbumFormat albumFormat,
                             @RequestParam(required = false) String[] albumDetails,
                             @RequestParam(required = false) String minPrice,
-                            @RequestParam(required = false) String maxPrice,
-                            @RequestParam(required = false) Long stockQuantity
+                            @RequestParam(required = false) String maxPrice
                         ) {
 
         List<AlbumDetail> albumDetailList = (albumDetails == null) ? null : Arrays.stream(albumDetails).map(AlbumDetail::valueOf).collect(Collectors.toList());
 
-        Page<Board> boardListPage = boardService.boardListAll(pageable, title, albumFormat, albumDetailList, minPrice, maxPrice, stockQuantity);
+        Page<Board> boardListPage = boardService.boardListAll(pageable, title, albumFormat, albumDetailList, minPrice, maxPrice);
 
+        System.out.println("boardListPage = " + boardListPage);
 
         // stackoverflowerror 발생 가능한 지점
         return boardListPage;
@@ -74,6 +77,7 @@ public class BoardController {
         } else {
             return null;
         }
+
     }
 
 //    @GetMapping("file/id/{id}")

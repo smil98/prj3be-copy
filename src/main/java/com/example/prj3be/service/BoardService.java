@@ -5,6 +5,7 @@ import com.example.prj3be.domain.*;
 import com.example.prj3be.repository.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +46,7 @@ public class BoardService {
     private final S3Client s3;
 
 
-    public Page<Board> boardListAll(Pageable pageable, String title, AlbumFormat albumFormat, List<AlbumDetail> albumDetails, String minPrice, String maxPrice, Long stockQuantity) {
+    public Page<Board> boardListAll(Pageable pageable, String title, AlbumFormat albumFormat, List<AlbumDetail> albumDetails, String minPrice, String maxPrice) {
         QBoard qBoard = board;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -60,8 +61,7 @@ public class BoardService {
         //AlbumDetail 검색조건
         if (albumDetails != null && !albumDetails.isEmpty()) {
             BooleanBuilder genreBuilder = new BooleanBuilder();
-            for (AlbumDetail detail :
-                    albumDetails) {
+            for (AlbumDetail detail : albumDetails) {
                 genreBuilder.or(qBoard.albumGenres.any().albumDetail.eq(detail));
             }
             builder.and(genreBuilder);
