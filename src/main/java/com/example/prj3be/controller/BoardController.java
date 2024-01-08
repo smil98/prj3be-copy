@@ -48,7 +48,6 @@ public class BoardController {
     public void add(@Validated Board saveBoard,
                     @RequestParam(required = false) String[] albumDetails,
                     @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files) throws IOException {
-
         List<AlbumDetail> AlbumDetailList = Arrays.stream(albumDetails)
                 .map(AlbumDetail::valueOf)
                 .collect(Collectors.toList());
@@ -72,16 +71,18 @@ public class BoardController {
     public void update(@PathVariable Long id,
                        Board updateBboard,
                        @RequestParam(value = "uploadFiles", required = false) MultipartFile uploadFiles) throws IOException {
-        System.out.println("updateBboard = " + updateBboard);
-        System.out.println("uploadFiles = " + uploadFiles);
-        System.out.println("updateBboard.getStockQuantity() = " + updateBboard.getStockQuantity());
-
         if (uploadFiles == null) {
             boardService.update(id, updateBboard);
 
         } else {
             boardService.update(id, updateBboard, uploadFiles);
         }
+    }
+
+    @GetMapping("/manage")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void manage() {
+
     }
 
 

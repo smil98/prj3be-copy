@@ -32,8 +32,6 @@ public class CommentController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Member memberByEmail = commentService.findMemberByEmail(authentication.getName());
-        System.out.println("memberByEmail = " + memberByEmail.getEmail());
-        System.out.println("authentication = " + authentication.getName());
         commentService.write(boardId, content, memberByEmail);
     }
 

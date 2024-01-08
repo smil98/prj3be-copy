@@ -75,10 +75,7 @@ public class MemberController {
     public ResponseEntity<FindMemberDto> method2() {
         // access token Jwt Filter에서 SecurityContextHolder에 넣어줌
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("MemberController.method2");
-        System.out.println("authentication = " + authentication);
         if(!authentication.getName().equals("anonymousUser")) {
-            System.out.println("authentication.getName() = " + authentication.getName());
             Member findMember = memberService.findMemberByEmail(authentication.getName());
             if(findMember != null) {
                 FindMemberDto dto = new FindMemberDto(findMember);

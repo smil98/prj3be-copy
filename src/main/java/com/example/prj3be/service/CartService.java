@@ -163,7 +163,7 @@ public class CartService {
     }
 
     public void addToLikeByCartItemId (Member member, List<Long> cartItemIds) {
-        List<Board> boards = cartItemRepository.findBoardIdByCartItemId(cartItemIds);
+        List<Board> boards = cartItemRepository.findBoardByCartItemId(cartItemIds);
         System.out.println("boards = " + boards);
         for(Board board : boards) {
             System.out.println("board = " + board);

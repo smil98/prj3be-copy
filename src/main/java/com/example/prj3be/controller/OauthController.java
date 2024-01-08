@@ -23,9 +23,7 @@ public class OauthController {
     @GetMapping("/{socialLoginType}") //MemberLogin.js > handleSocialLogin
     public String socialLoginType(@PathVariable(name="socialLoginType") String socialLoginType) {
         SocialLoginType type = SocialLoginType.valueOf(socialLoginType);
-//        System.out.println("socialLoginType = " + type);
         String redirectUrl = oauthService.loginRequest(type);
-//        System.out.println("redirectUrl = " + redirectUrl);
 
         return redirectUrl;
     }
@@ -35,7 +33,6 @@ public class OauthController {
                                                   @RequestParam(name="code") String code) throws IOException {
         SocialLoginType type = SocialLoginType.valueOf(socialLoginType.toUpperCase());
         ResponseEntity<TokenDto> tokenDto = oauthService.oAuthLogin(type, code);
-        System.out.println("callback의 리턴 statement 이전");
         return tokenDto;
     }
 
@@ -45,9 +42,7 @@ public class OauthController {
         if(StringUtils.hasText(refreshToken) && refreshToken.startsWith("Bearer ")){
             refreshToken = refreshToken.substring(7);
         }
-        System.out.println("oAuthRefresh : refreshToken = " + refreshToken);
         ResponseEntity<Integer> expiresIn = oauthService.refreshAccessToken(refreshToken);
-        System.out.println("expiresIn = " + expiresIn);
 
         return expiresIn;
     }

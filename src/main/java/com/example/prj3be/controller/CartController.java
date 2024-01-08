@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,11 +32,8 @@ public class CartController {
         System.out.println("CartController.fetchCart");
         //accessToken으로부터 로그인 아이디 추출
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("===========================================================");
-        System.out.println("email = " + email);
         //로그인 아이디로부터 멤버 아이디 추출
         Long memberId = memberRepository.findIdByEmail(email);
-        System.out.println("memberId = " + memberId);
 
         return cartService.getCartList(memberId);
     }
@@ -91,10 +89,12 @@ public class CartController {
     }
 
     @DeleteMapping("/delete/cartItems")
-    public ResponseEntity deleteSelectedCartItems(@RequestParam Map<String, List<Long>> request,
+    public ResponseEntity deleteSelectedCartItems(@RequestParam List<String> selectedItems,
                                                   @RequestHeader("Authorization") String accessToken) {
         System.out.println("CartController.deleteSelectedCartItems");
-        List<Long> cartItemIds = request.get("selectedItems");
+        List<Long> cartItemIds = selectedItems.stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
 
         if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
             accessToken = accessToken.substring(7);
@@ -102,7 +102,7 @@ public class CartController {
 
         if(tokenProvider.validateToken(accessToken)) {
             try {
-                cartService.deleteSelectedLikes(cartItemIds);
+                cartService.deleteCartItemsByCartItemId(cartItemIds);
                 return ResponseEntity.ok().build();
             } catch (Exception e) {
                 System.out.println("Error occured while deleting = " + e);
@@ -204,7 +204,7 @@ public class CartController {
             cartService.deleteCartItemByCartAndCartItem(memberId, cartItemId);
             return ResponseEntity.ok(cartItemId + "번 아이템 삭제 완료");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("카트 아이템 삭제 중 오류 발생: " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카트 아이템 삭제 중 오류 발생");
         }
     }
@@ -225,10 +225,8 @@ public class CartController {
     public void subtractCount(@PathVariable Long cartItemId) {
         System.out.println("CartController.subtractCount");
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("email = " + email);
         //로그인 아이디로부터 멤버 아이디 추출
         Long memberId = memberRepository.findIdByEmail(email);
-        System.out.println("memberId = " + memberId);
 
         cartService.subtractCountFromCartItem(memberId, cartItemId);
     }

@@ -34,7 +34,6 @@ public class OrderController {
             dto.setEmail(findMember.getEmail());
             dto.setGender(findMember.getGender());
             dto.setRole(findMember.getRole());
-            System.out.println(dto);
             return ResponseEntity.ok(dto);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -26,9 +26,6 @@ public class LikeController {
     @GetMapping("/update/{boardId}")
     public ResponseEntity<Map<String, Object>> like(@PathVariable Long boardId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        System.out.println("id = " + boardId);
-
         return ResponseEntity.ok(service.updateLike(boardId, email));
     }
 
@@ -47,10 +44,7 @@ public class LikeController {
                                      @RequestParam(value = "c",defaultValue = "all") String category,
     @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
 
-        System.out.println("LikeController.fetchLiked");
-        System.out.println("Received Token: " + authorizationHeader);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("authentication = " + authentication);
         String email = authentication.getName();
 
         // 관리자라면 어떤 id이든 바로 승인
