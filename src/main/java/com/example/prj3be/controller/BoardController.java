@@ -77,7 +77,6 @@ public class BoardController {
         } else {
             return null;
         }
-
     }
 
 //    @GetMapping("file/id/{id}")
@@ -110,12 +109,13 @@ public class BoardController {
         }
 
         if(tokenProvider.validateToken(accessToken)) {
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication); //@@이게 컨택스트 저장하는 거래
             Page<Board> boardsPage = boardService.getAllBoards(pageable, keyword, category);
             return boardsPage.map(BoardsDto::new);
         } else {
             return null;
         }
-
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.prj3be.service;
 
 import com.example.prj3be.domain.Member;
+import com.example.prj3be.domain.Order;
 import com.example.prj3be.domain.QMember;
 import com.example.prj3be.dto.MemberEditFormDto;
 import com.example.prj3be.repository.MemberRepository;
@@ -93,15 +94,12 @@ public class MemberService {
         return member;
     }
 
-    //TODO: 수정 요망
-    public List<String> findOrderListByEmail(String email) {
-        Optional<Member> byEmail = memberRepository.findByEmail(email);
-        Member member = byEmail.orElseThrow();
-        Long id = member.getId();
-        return orderRepository.findOrderNamesByMemberId(id);
+    public List<Order> findOrderListById(Long id) {
+        return orderRepository.findOrdersByMemberId(id);
     }
 
     public void deleteMember(Long id) {
         memberRepository.deleteById(id);
     }
+
 }

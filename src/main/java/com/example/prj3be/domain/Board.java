@@ -38,7 +38,7 @@ public class Board {
     private LocalDate releaseDate;
 
     @Column(name = "stock_quantity", columnDefinition = "BIGINT DEFAULT 100")
-    private Long stockQuantity;
+    private Long stockQuantity = 100L;
 
     @OneToMany(mappedBy = "board")
     private List <Likes> likes_board;

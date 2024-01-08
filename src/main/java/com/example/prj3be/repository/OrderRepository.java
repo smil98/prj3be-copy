@@ -10,11 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
-    @Query("SELECT o.orderName FROM Order o WHERE o.member.id = :id")
-    List<String> findOrderNamesByMemberId(@Param("id") Long id);
     @Transactional
     @Modifying
     @Query("DELETE FROM Order o WHERE o.member.id = :memberId")
     int deleteByMemberId(Long memberId);
+
+    @Query("SELECT o FROM Order o WHERE o.member.id = :id")
+    List<Order> findOrdersByMemberId(@Param("id") Long id);
 
 }

@@ -3,6 +3,7 @@ package com.example.prj3be.controller;
 import com.example.prj3be.constant.Role;
 import com.example.prj3be.domain.Likes;
 import com.example.prj3be.domain.Member;
+import com.example.prj3be.domain.Order;
 import com.example.prj3be.dto.FindMemberDto;
 import com.example.prj3be.dto.MemberEditFormDto;
 import com.example.prj3be.dto.MemberFormDto;
@@ -151,10 +152,29 @@ public class MemberController {
         return memberPage.map(FindMemberDto::new);
     }
 
-    //TODO: 주문한 정보 리턴인데 수정하길...
-    @GetMapping("/{email}/orders")
-    public List<String> method7(@PathVariable String email){
-        return memberService.findOrderListByEmail(email);
+    @GetMapping("/order/{id}")
+    public ResponseEntity<List<Order>> getOrderList(@PathVariable Long id, @RequestHeader("Authorization") String accessToken) {
+        if(StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+            accessToken = accessToken.substring(7);
+            if(tokenProvider.validateToken(accessToken)) {
+                Member member = memberService.findMemberById(id);
+                if(member.getEmail() == SecurityContextHolder.getContext().getAuthentication().getName()) {
+                    try {
+                        List<Order> orders = memberService.findOrderListById(id);
+                        return ResponseEntity.ok(orders);
+                    } catch (Exception e) {
+                        System.out.println("멤버 찾는 도중 에러: " + e);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @DeleteMapping("/delete/{id}")
