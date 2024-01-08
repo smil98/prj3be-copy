@@ -169,10 +169,10 @@ public class BoardService {
 
     public void update(Long id, Board updateBboard, MultipartFile uploadFiles) throws IOException {
         Board updatedBoard = update(id, updateBboard);
-//        boardFileRepository.deleteBoardFileByBoardId(id);
+        boardFileRepository.deleteBoardFileByBoardId(id);
 
         BoardFile boardFile = new BoardFile();
-        String url = urlPrefix + "prj3/" + id + "/" + uploadFiles.getOriginalFilename();
+        String url = urlPrefix + "prj1/" + id + "/" + uploadFiles.getOriginalFilename();
         boardFile.setFileName(uploadFiles.getOriginalFilename());
         boardFile.setFileUrl(url);
         boardFile.setBoard(updatedBoard);

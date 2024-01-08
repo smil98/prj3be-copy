@@ -91,7 +91,6 @@ public class BoardController {
                        @RequestParam(value = "uploadFiles", required = false) MultipartFile uploadFiles) throws IOException {
         if (uploadFiles == null) {
             boardService.update(id, updateBboard);
-
         } else {
             boardService.update(id, updateBboard, uploadFiles);
         }
@@ -109,8 +108,6 @@ public class BoardController {
         }
 
         if(tokenProvider.validateToken(accessToken)) {
-            Authentication authentication = tokenProvider.getAuthentication(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication); //@@이게 컨택스트 저장하는 거래
             Page<Board> boardsPage = boardService.getAllBoards(pageable, keyword, category);
             return boardsPage.map(BoardsDto::new);
         } else {
