@@ -40,12 +40,14 @@ public class LikeController {
     @GetMapping("/list/{id}")
     public Page<LikesDto> fetchLiked(Pageable pageable,
                                      @PathVariable Long id,
-                                     @RequestParam(value = "k",defaultValue = "") String keyword,
-                                     @RequestParam(value = "c",defaultValue = "all") String category,
+                                     @RequestParam(value = "k", defaultValue = "") String keyword,
+                                     @RequestParam(value = "c", defaultValue = "all") String category,
     @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
+
+        System.out.println("받은 파라미터: keyword=" + keyword + ", category=" + category + ", memberID=" + id);
 
         // 관리자라면 어떤 id이든 바로 승인
         if(authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))) {
