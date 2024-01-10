@@ -61,7 +61,6 @@ public class OauthService {
     }
 
     // 소셜 타입 찾기 : 토큰 관리용
-
     private SocialTokenManager findSocialTokenManagerByType(SocialLoginType socialLoginType) {
         return socialTokenManagers.stream()
                 .filter(x -> x.type() == socialLoginType)
@@ -139,7 +138,7 @@ public class OauthService {
             httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + tokens);
             System.out.println("httpHeaders = " + httpHeaders);
 
-            return new ResponseEntity<>(new TokenDto(tokens.getAccessToken(), tokens.getRefreshToken()), HttpStatus.OK);
+            return new ResponseEntity<>(tokens, HttpStatus.OK);
         } catch (AuthenticationException e){
             System.out.println("인증 실패 :"+e.getMessage());
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
